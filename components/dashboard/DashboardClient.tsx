@@ -23,15 +23,21 @@ const StatCard = ({ icon, label, value, trend }: any) => (
     </div>
 );
 
-export default function DashboardClient({ userEmail, fullName, initialLandmarks = [], initialIncidents = [] }: { userEmail: string, fullName: string, initialLandmarks?: any[], initialIncidents?: any[] }) {
+export default function DashboardClient({ userEmail, fullName, initialLandmarks = [], initialIncidents = [], userSubmissions = [] }: { userEmail: string, fullName: string, initialLandmarks?: any[], initialIncidents?: any[], userSubmissions?: any[] }) {
     const [isLandmarkFormOpen, setIsLandmarkFormOpen] = useState(false);
     const [isIncidentFormOpen, setIsIncidentFormOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredLandmarks = initialLandmarks.filter(l =>
+        l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="min-h-screen bg-slate-950 flex">
             <Sidebar />
             <div className="flex-1 ml-64">
-                <TopNav title="Operational Console" />
+                <TopNav title="Operational Console" onSearch={setSearchQuery} />
 
                 <main className="p-8">
                     <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
@@ -68,9 +74,42 @@ export default function DashboardClient({ userEmail, fullName, initialLandmarks 
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 p-8 rounded-3xl glass border-white/5 relative overflow-hidden group">
-                            <div className="aspect-video">
-                                <CityMap initialLandmarks={initialLandmarks} />
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="p-8 rounded-3xl glass border-white/5 relative overflow-hidden group">
+                                <div className="aspect-video">
+                                    <CityMap initialLandmarks={filteredLandmarks} initialIncidents={initialIncidents} />
+                                </div>
+                            </div>
+
+                            <div className="p-8 rounded-3xl glass border-white/5">
+                                <h3 className="text-xl font-bold uppercase tracking-tight mb-6 flex justify-between items-center">
+                                    My Intelligence History
+                                    <span className="text-[10px] font-mono text-slate-500 bg-white/5 px-2 py-1 rounded">ID_{userEmail.split('@')[0].toUpperCase()}</span>
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {userSubmissions.length === 0 ? (
+                                        <div className="col-span-2 py-12 text-center border border-dashed border-white/10 rounded-2xl">
+                                            <p className="text-slate-500 text-sm">No personal nodes established in this sector yet.</p>
+                                        </div>
+                                    ) : (
+                                        userSubmissions.map((sub: any, i: number) => (
+                                            <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/20 transition-all flex justify-between items-start gap-4">
+                                                <div className="flex gap-4">
+                                                    <div className={`p-3 rounded-xl ${sub.is_verified ? 'bg-accent/10 text-accent' : 'bg-yellow-500/10 text-yellow-500'} border border-current/20`}>
+                                                        <MapPin size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-white mb-1">{sub.name}</p>
+                                                        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{sub.category}</p>
+                                                    </div>
+                                                </div>
+                                                <div className={`text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest ${sub.is_verified ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}`}>
+                                                    {sub.is_verified ? 'Verified' : 'Pending'}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
                             </div>
                         </div>
 

@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
 import { Search, Bell, User, ChevronDown } from 'lucide-react';
 
-const TopNav = ({ title }: { title: string }) => {
+const TopNav = ({ title, onSearch }: { title: string, onSearch?: (q: string) => void }) => {
     return (
         <header className="h-20 border-b border-white/5 bg-slate-950/20 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-40">
             <h2 className="text-xl font-bold tracking-tight uppercase text-white">{title}</h2>
@@ -12,6 +14,7 @@ const TopNav = ({ title }: { title: string }) => {
                     <input
                         type="text"
                         placeholder="Search city mesh..."
+                        onChange={(e) => onSearch?.(e.target.value)}
                         className="bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-accent/50 w-64 transition-all"
                     />
                 </div>

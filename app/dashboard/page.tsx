@@ -32,12 +32,20 @@ export default async function Dashboard() {
         .select("*")
         .gt("expires_at", new Date().toISOString());
 
+    // Fetch user's own submissions for history
+    const { data: userSubmissions } = await supabase
+        .from("landmarks")
+        .select("*")
+        .eq("submitted_by", user.id)
+        .order('created_at', { ascending: false });
+
     return (
         <DashboardClient
             userEmail={user.email!}
             fullName={profile?.full_name || user.email!.split('@')[0]}
             initialLandmarks={landmarks || []}
             initialIncidents={incidents || []}
+            userSubmissions={userSubmissions || []}
         />
     );
 }
