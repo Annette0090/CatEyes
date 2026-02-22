@@ -46,7 +46,13 @@ export default function AdminDashboardClient({ pendingLandmarks }: { pendingLand
                                 <div className="text-lg font-bold text-white uppercase tracking-tight">Active Surveillance: Level 4 Delta</div>
                             </div>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 items-center">
+                            <a
+                                href="/dashboard"
+                                className="px-4 py-2 border border-white/10 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-accent hover:border-accent/30 transition-all"
+                            >
+                                Switch to Map HUD
+                            </a>
                             <div className="text-right">
                                 <div className="text-[10px] text-slate-500 font-mono uppercase">Verification_Queue</div>
                                 <div className="text-sm font-bold text-white">{items.length} Pending</div>

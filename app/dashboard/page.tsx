@@ -16,7 +16,7 @@ export default async function Dashboard() {
     // Fetch user profile
     const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, role")
         .eq("id", user.id)
         .single();
 
@@ -43,6 +43,7 @@ export default async function Dashboard() {
         <DashboardClient
             userEmail={user.email!}
             fullName={profile?.full_name || user.email!.split('@')[0]}
+            role={profile?.role || 'user'}
             initialLandmarks={landmarks || []}
             initialIncidents={incidents || []}
             userSubmissions={userSubmissions || []}

@@ -23,7 +23,7 @@ const StatCard = ({ icon, label, value, trend }: any) => (
     </div>
 );
 
-export default function DashboardClient({ userEmail, fullName, initialLandmarks = [], initialIncidents = [], userSubmissions = [] }: { userEmail: string, fullName: string, initialLandmarks?: any[], initialIncidents?: any[], userSubmissions?: any[] }) {
+export default function DashboardClient({ userEmail, fullName, role = 'user', initialLandmarks = [], initialIncidents = [], userSubmissions = [] }: { userEmail: string, fullName: string, role?: string, initialLandmarks?: any[], initialIncidents?: any[], userSubmissions?: any[] }) {
     const [isLandmarkFormOpen, setIsLandmarkFormOpen] = useState(false);
     const [isIncidentFormOpen, setIsIncidentFormOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -35,7 +35,7 @@ export default function DashboardClient({ userEmail, fullName, initialLandmarks 
 
     return (
         <div className="min-h-screen bg-slate-950 flex">
-            <Sidebar />
+            <Sidebar isAdmin={role === 'admin'} />
             <div className="flex-1 ml-64">
                 <TopNav title="Operational Console" onSearch={setSearchQuery} />
 

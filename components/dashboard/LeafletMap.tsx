@@ -22,17 +22,45 @@ const IncidentIcon = L.icon({
     iconAnchor: [12, 41],
 });
 
+const UserIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+});
+
+function LocationMarker() {
+    const [position, setPosition] = React.useState<L.LatLng | null>(null);
+    const map = useMap();
+
+    useEffect(() => {
+        map.locate().on("locationfound", function (e) {
+            setPosition(e.latlng);
+            map.flyTo(e.latlng, 15);
+        });
+    }, [map]);
+
+    return position === null ? null : (
+        <Marker position={position} icon={UserIcon}>
+            <Popup>
+                <div className="p-1 font-bold text-accent uppercase text-[10px]">Your Current Intel Node</div>
+            </Popup>
+        </Marker>
+    )
+}
+
 const LeafletMap = ({ initialLandmarks = [], initialIncidents = [] }: { initialLandmarks?: any[], initialIncidents?: any[] }) => {
-    const center: [number, number] = [5.6037, -0.1870]; // Accra, Ghana
+    const defaultCenter: [number, number] = [5.6037, -0.1870]; // Accra, Ghana
 
     return (
         <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 relative z-0">
             <MapContainer
-                center={center}
+                center={defaultCenter}
                 zoom={13}
                 scrollWheelZoom={true}
                 style={{ height: '100%', width: '100%', background: '#020617' }}
             >
+                <LocationMarker />
                 {/* Dark Mode Tiles from CartoDB - Free and No Key Required */}
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
