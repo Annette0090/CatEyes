@@ -6,6 +6,8 @@ import TopNav from '@/components/dashboard/TopNav';
 import CityMap from '@/components/dashboard/Map';
 import LandmarkForm from '@/components/dashboard/LandmarkForm';
 import IncidentForm from '@/components/dashboard/IncidentForm';
+import ActivityFeed from '@/components/dashboard/ActivityFeed';
+import PreferencesDialog from '@/components/dashboard/PreferencesDialog';
 import { MapPin, Navigation, Clock, Zap, AlertTriangle } from 'lucide-react';
 
 const StatCard = ({ icon, label, value, trend }: any) => (
@@ -23,9 +25,34 @@ const StatCard = ({ icon, label, value, trend }: any) => (
     </div>
 );
 
-export default function DashboardClient({ userEmail, fullName, role = 'user', initialLandmarks = [], initialIncidents = [], userSubmissions = [] }: { userEmail: string, fullName: string, role?: string, initialLandmarks?: any[], initialIncidents?: any[], userSubmissions?: any[] }) {
+export default function DashboardClient({
+    userId,
+    userEmail,
+    fullName,
+    role = 'user',
+    trustScore = 0,
+    intelCredits = 0,
+    preferences = {},
+    initialLandmarks = [],
+    initialIncidents = [],
+    userSubmissions = []
+}: {
+    userId: string,
+    userEmail: string,
+    fullName: string,
+    role?: string,
+    trustScore?: number,
+    intelCredits?: number,
+    preferences?: any,
+    initialLandmarks?: any[],
+    initialIncidents?: any[],
+    userSubmissions?: any[]
+}) {
     const [isLandmarkFormOpen, setIsLandmarkFormOpen] = useState(false);
     const [isIncidentFormOpen, setIsIncidentFormOpen] = useState(false);
+    const [isActivityFeedOpen, setIsActivityFeedOpen] = useState(false);
+    const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredLandmarks = initialLandmarks.filter(l =>
@@ -33,13 +60,29 @@ export default function DashboardClient({ userEmail, fullName, role = 'user', in
         l.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    return (
-        <div className="min-h-screen bg-slate-950 flex">
-            <Sidebar isAdmin={role === 'admin'} />
-            <div className="flex-1 ml-64">
-                <TopNav title="Operational Console" onSearch={setSearchQuery} />
+    const isSuperAdmin = userEmail === "cateyes0090@gmail.com";
 
-                <main className="p-8">
+    return (
+        <div className="min-h-screen bg-slate-950 flex overflow-x-hidden">
+            <Sidebar
+                isAdmin={role === 'admin' || isSuperAdmin}
+                isSuperAdmin={isSuperAdmin}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                onLandmarksClick={() => setIsLandmarkFormOpen(true)}
+                onAlertsClick={() => setIsActivityFeedOpen(true)}
+                onPreferencesClick={() => setIsPreferencesOpen(true)}
+                trustScore={trustScore}
+                intelCredits={intelCredits}
+            />
+            <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-64'}`}>
+                <TopNav
+                    title="Operational Console"
+                    onSearch={setSearchQuery}
+                    onMenuClick={() => setIsSidebarOpen(true)}
+                />
+
+                <main className="p-4 lg:p-8">
                     <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
                         <div>
                             <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Welcome Back, {fullName}</h1>
@@ -66,44 +109,54 @@ export default function DashboardClient({ userEmail, fullName, role = 'user', in
                     <LandmarkForm isOpen={isLandmarkFormOpen} onClose={() => setIsLandmarkFormOpen(false)} />
                     <IncidentForm isOpen={isIncidentFormOpen} onClose={() => setIsIncidentFormOpen(false)} />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <StatCard icon={<MapPin size={24} />} label="Active Landmarks" value="2,481" trend="+12%" />
-                        <StatCard icon={<Navigation size={24} />} label="Optimized Routes" value="124" trend="+5%" />
-                        <StatCard icon={<Clock size={24} />} label="Avg. Savings" value="18m" trend="-4s" />
-                        <StatCard icon={<Zap size={24} />} label="System Uptime" value="99.9%" trend="LIVE" />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                        <StatCard icon={<MapPin size={20} />} label="Landmarks" value="2,481" trend="+12%" />
+                        <StatCard icon={<Navigation size={20} />} label="Routes" value="124" trend="+5%" />
+                        <StatCard icon={<Clock size={20} />} label="Avg. Savings" value="18m" trend="-4s" />
+                        <StatCard icon={<Zap size={20} />} label="Uptime" value="99.9%" trend="LIVE" />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 space-y-6">
-                            <div className="p-8 rounded-3xl glass border-white/5 relative overflow-hidden group">
-                                <div className="aspect-video">
-                                    <CityMap initialLandmarks={filteredLandmarks} initialIncidents={initialIncidents} />
+                            <div className="p-4 lg:p-8 rounded-3xl glass border-white/5 relative overflow-hidden group">
+                                <div className="aspect-video w-full h-full min-h-[300px] lg:min-h-0">
+                                    <CityMap
+                                        initialLandmarks={filteredLandmarks}
+                                        initialIncidents={initialIncidents}
+                                        theme={preferences.theme || 'dark'}
+                                        lowBandwidth={preferences.lowBandwidth || false}
+                                    />
                                 </div>
                             </div>
 
-                            <div className="p-8 rounded-3xl glass border-white/5">
-                                <h3 className="text-xl font-bold uppercase tracking-tight mb-6 flex justify-between items-center">
+                            <div className="p-6 lg:p-8 rounded-3xl glass border-white/5">
+                                <h3 className="text-lg lg:text-xl font-bold uppercase tracking-tight mb-6 flex justify-between items-center">
                                     My Intelligence History
                                     <span className="text-[10px] font-mono text-slate-500 bg-white/5 px-2 py-1 rounded">ID_{userEmail.split('@')[0].toUpperCase()}</span>
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {userSubmissions.length === 0 ? (
-                                        <div className="col-span-2 py-12 text-center border border-dashed border-white/10 rounded-2xl">
-                                            <p className="text-slate-500 text-sm">No personal nodes established in this sector yet.</p>
+                                        <div className="col-span-1 md:col-span-2 py-12 text-center border border-dashed border-white/10 rounded-2xl">
+                                            <p className="text-slate-500 text-sm px-4">No personal nodes established in this sector yet.</p>
                                         </div>
                                     ) : (
                                         userSubmissions.map((sub: any, i: number) => (
                                             <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/20 transition-all flex justify-between items-start gap-4">
                                                 <div className="flex gap-4">
-                                                    <div className={`p-3 rounded-xl ${sub.is_verified ? 'bg-accent/10 text-accent' : 'bg-yellow-500/10 text-yellow-500'} border border-current/20`}>
+                                                    <div className={`p-3 rounded-xl ${sub.is_verified ? 'bg-accent/10 text-accent' : 'bg-yellow-500/10 text-yellow-500'} border border-current/20 flex flex-col gap-2 shrink-0`}>
                                                         <MapPin size={20} />
+                                                        {sub.image_url && (
+                                                            <div className="w-8 h-8 rounded-md overflow-hidden bg-slate-800">
+                                                                <img src={sub.image_url} alt="" className="w-full h-full object-cover" />
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <div>
-                                                        <p className="text-sm font-bold text-white mb-1">{sub.name}</p>
+                                                    <div className="overflow-hidden">
+                                                        <p className="text-sm font-bold text-white mb-1 truncate">{sub.name}</p>
                                                         <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{sub.category}</p>
                                                     </div>
                                                 </div>
-                                                <div className={`text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest ${sub.is_verified ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}`}>
+                                                <div className={`text-[8px] shrink-0 font-black px-2 py-1 rounded-full uppercase tracking-widest ${sub.is_verified ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}`}>
                                                     {sub.is_verified ? 'Verified' : 'Pending'}
                                                 </div>
                                             </div>
@@ -113,21 +166,21 @@ export default function DashboardClient({ userEmail, fullName, role = 'user', in
                             </div>
                         </div>
 
-                        <div className="p-8 rounded-3xl glass border-white/5">
-                            <h3 className="text-xl font-bold uppercase tracking-tight mb-8">User Intelligence</h3>
+                        <div className="p-6 lg:p-8 rounded-3xl glass border-white/5 h-fit lg:sticky lg:top-28">
+                            <h3 className="text-lg lg:text-xl font-bold uppercase tracking-tight mb-8">User Intelligence</h3>
                             <div className="space-y-4">
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 overflow-hidden">
                                     <div className="text-[10px] text-slate-500 font-mono mb-1">AUTH_NODE</div>
-                                    <div className="text-sm font-bold text-white uppercase">{userEmail}</div>
+                                    <div className="text-sm font-bold text-white uppercase truncate">{userEmail}</div>
                                 </div>
-                                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                                <div className="p-3 lg:p-4 rounded-xl bg-white/5 border border-white/5">
                                     <div className="text-[10px] text-slate-500 font-mono mb-1">SECTOR_STATUS</div>
                                     <div className="text-sm font-bold text-green-500 uppercase tracking-tighter">Synchronized</div>
                                 </div>
                             </div>
                             <div className="mt-8">
                                 <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 px-2">Live Intelligence Feed</div>
-                                <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                                <div className="space-y-2 max-h-[300px] lg:max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                     {initialIncidents.length === 0 ? (
                                         <div className="text-[10px] text-slate-600 italic px-2">No active incidents in your sector.</div>
                                     ) : (
@@ -147,6 +200,14 @@ export default function DashboardClient({ userEmail, fullName, role = 'user', in
                     </div>
                 </main>
             </div>
+
+            <ActivityFeed isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
+            <PreferencesDialog
+                isOpen={isPreferencesOpen}
+                onClose={() => setIsPreferencesOpen(false)}
+                userId={userId}
+                initialPreferences={preferences}
+            />
         </div>
     );
 }

@@ -5,8 +5,13 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
-  role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  avatar_url TEXT,
+  role TEXT DEFAULT 'user',
+  trust_score INTEGER DEFAULT 1,
+  intel_credits INTEGER DEFAULT 0,
+  admin_verified BOOLEAN DEFAULT FALSE,
+  preferences JSONB DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 2. Create Landmarks table
@@ -19,6 +24,7 @@ CREATE TABLE IF NOT EXISTS public.landmarks (
   latitude DOUBLE PRECISION NOT NULL,
   submitted_by UUID REFERENCES auth.users(id),
   is_verified BOOLEAN DEFAULT FALSE,
+  image_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -32,6 +38,10 @@ CREATE TABLE IF NOT EXISTS public.incidents (
   reported_by UUID REFERENCES auth.users(id),
   severity TEXT DEFAULT 'MEDIUM' CHECK (severity IN ('LOW', 'MEDIUM', 'HIGH')),
   expires_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '4 hours'),
+  status TEXT DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'RESOLVED', 'EXPIRED')),
+  image_url TEXT,
+  resolved_at TIMESTAMP WITH TIME ZONE,
+  resolved_by UUID REFERENCES public.profiles(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, MapPin, Send, Loader2 } from 'lucide-react';
+import { X, MapPin, Send, Loader2, Camera } from 'lucide-react';
 import { submitLandmark } from '@/app/dashboard/actions';
 
 interface LandmarkFormProps {
@@ -12,6 +12,20 @@ interface LandmarkFormProps {
 const LandmarkForm = ({ isOpen, onClose }: LandmarkFormProps) => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [coords, setCoords] = useState({ lat: '5.6037', lng: '-0.1870' });
+
+    const fetchGps = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                setCoords({
+                    lat: position.coords.latitude.toString(),
+                    lng: position.coords.longitude.toString()
+                });
+            }, (error) => {
+                alert("GPS Error: " + error.message);
+            });
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -82,11 +96,8 @@ const LandmarkForm = ({ isOpen, onClose }: LandmarkFormProps) => {
                                 <div className="text-[10px] absolute -top-4 left-0 font-black uppercase tracking-widest text-slate-500 mb-2">Location Detection</div>
                                 <button
                                     type="button"
+                                    onClick={fetchGps}
                                     className="w-full py-3 bg-white/5 border border-white/10 text-slate-400 hover:text-accent hover:border-accent/50 rounded-xl transition-all flex items-center justify-center gap-2 text-xs font-bold"
-                                    onClick={() => {
-                                        // In a real app, this would use Geolocation API
-                                        alert("GPS Locked: Using current coordinates.");
-                                    }}
                                 >
                                     <MapPin size={14} />
                                     FETCH_GPS
@@ -101,7 +112,8 @@ const LandmarkForm = ({ isOpen, onClose }: LandmarkFormProps) => {
                                     name="latitude"
                                     step="any"
                                     required
-                                    defaultValue="5.6037"
+                                    value={coords.lat}
+                                    onChange={(e) => setCoords({ ...coords, lat: e.target.value })}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent transition-all"
                                 />
                             </div>
@@ -111,9 +123,30 @@ const LandmarkForm = ({ isOpen, onClose }: LandmarkFormProps) => {
                                     name="longitude"
                                     step="any"
                                     required
-                                    defaultValue="-0.1870"
+                                    value={coords.lng}
+                                    onChange={(e) => setCoords({ ...coords, lng: e.target.value })}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-accent transition-all"
                                 />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Visual Evidence (Photo)</label>
+                            <div className="relative">
+                                <input
+                                    type="file"
+                                    name="photo"
+                                    accept="image/*"
+                                    className="hidden"
+                                    id="photo-upload"
+                                />
+                                <label
+                                    htmlFor="photo-upload"
+                                    className="w-full bg-white/5 border border-white/10 border-dashed rounded-xl px-4 py-6 text-slate-500 hover:text-accent hover:border-accent/50 transition-all cursor-pointer flex flex-col items-center justify-center gap-2"
+                                >
+                                    <Camera size={24} />
+                                    <span className="text-xs font-bold uppercase tracking-widest">Select_Field_Capture</span>
+                                </label>
                             </div>
                         </div>
 

@@ -30,12 +30,13 @@ const StatCard = ({ icon, label, value, trend }: any) => (
 
 export default function UserDemo() {
     const [isFormOpen, setIsFormOpen] = React.useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-950 flex">
-            <Sidebar />
-            <div className="flex-1 ml-64">
-                <TopNav title="User Intelligence Suite" />
+        <div className="min-h-screen bg-slate-950 flex overflow-x-hidden">
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            <div className="flex-1 lg:ml-64 transition-all duration-300">
+                <TopNav title="User Intelligence Suite" onMenuClick={() => setIsSidebarOpen(true)} />
 
                 <main className="p-8">
                     <div className="flex justify-between items-center mb-8">

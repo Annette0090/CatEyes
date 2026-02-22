@@ -1,12 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Search, Bell, User, ChevronDown } from 'lucide-react';
+import { Search, Bell, User, ChevronDown, Menu } from 'lucide-react';
 
-const TopNav = ({ title, onSearch }: { title: string, onSearch?: (q: string) => void }) => {
+const TopNav = ({ title, onSearch, onMenuClick }: { title: string, onSearch?: (q: string) => void, onMenuClick?: () => void }) => {
     return (
-        <header className="h-20 border-b border-white/5 bg-slate-950/20 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-40">
-            <h2 className="text-xl font-bold tracking-tight uppercase text-white">{title}</h2>
+        <header className="h-20 border-b border-white/5 bg-slate-950/20 backdrop-blur-md flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40">
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={onMenuClick}
+                    className="p-2 lg:hidden text-slate-400 hover:text-white transition-colors"
+                >
+                    <Menu size={24} />
+                </button>
+                <h2 className="text-lg lg:text-xl font-bold tracking-tight uppercase text-white truncate max-w-[150px] sm:max-w-none">{title}</h2>
+            </div>
 
             <div className="flex items-center gap-6">
                 <div className="relative hidden lg:block">

@@ -15,11 +15,14 @@ export default async function AdminDashboard() {
     // 2. Check Admin Role
     const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role, admin_verified, trust_score, intel_credits")
         .eq("id", user.id)
         .single();
 
-    if (profile?.role !== "admin") {
+    const isSuperAdmin = user.email === "cateyes0090@gmail.com";
+    const isVerifiedAdmin = profile?.role === "admin" && profile?.admin_verified;
+
+    if (!isSuperAdmin && !isVerifiedAdmin) {
         return redirect("/dashboard");
     }
 
@@ -30,5 +33,12 @@ export default async function AdminDashboard() {
         .eq("is_verified", false)
         .order("created_at", { ascending: false });
 
-    return <AdminDashboardClient pendingLandmarks={pendingLandmarks || []} />;
+    return (
+        <AdminDashboardClient
+            pendingLandmarks={pendingLandmarks || []}
+            userEmail={user.email!}
+            trustScore={profile?.trust_score || 0}
+            intelCredits={profile?.intel_credits || 0}
+        />
+    );
 }

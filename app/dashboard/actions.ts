@@ -18,6 +18,28 @@ export async function submitLandmark(formData: FormData) {
     const description = formData.get("description") as string;
     const latitude = parseFloat(formData.get("latitude") as string);
     const longitude = parseFloat(formData.get("longitude") as string);
+    const photo = formData.get("photo") as File;
+
+    let imageUrl = null;
+
+    if (photo && photo.size > 0) {
+        const fileExt = photo.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('landmark-photos')
+            .upload(filePath, photo);
+
+        if (uploadError) {
+            console.error("Upload error:", uploadError);
+        } else {
+            const { data: { publicUrl } } = supabase.storage
+                .from('landmark-photos')
+                .getPublicUrl(filePath);
+            imageUrl = publicUrl;
+        }
+    }
 
     const { error } = await supabase.from("landmarks").insert({
         name,
@@ -27,6 +49,7 @@ export async function submitLandmark(formData: FormData) {
         longitude,
         submitted_by: user.id,
         is_verified: false, // Needs admin approval
+        image_url: imageUrl
     });
 
     if (error) {

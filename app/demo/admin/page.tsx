@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopNav from '@/components/dashboard/TopNav';
 import { Target, ShieldAlert, Cpu, BarChart4, ArrowUpRight, Activity } from 'lucide-react';
@@ -16,11 +18,13 @@ const AdminStat = ({ label, value, sub, color = 'accent' }: any) => (
 );
 
 export default function AdminDemo() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     return (
-        <div className="min-h-screen bg-slate-950 flex">
-            <Sidebar isAdmin={true} />
-            <div className="flex-1 ml-64">
-                <TopNav title="Strategic Command Center" />
+        <div className="min-h-screen bg-slate-950 flex overflow-x-hidden">
+            <Sidebar isAdmin={true} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            <div className="flex-1 lg:ml-64 transition-all duration-300">
+                <TopNav title="Strategic Command Center" onMenuClick={() => setIsSidebarOpen(true)} />
 
                 <main className="p-8">
                     {/* HIGH PRIORITY STATUS */}

@@ -14,6 +14,23 @@ const LeafletMap = dynamic(
     }
 );
 
-export default function Map({ initialLandmarks, initialIncidents }: { initialLandmarks?: any[], initialIncidents?: any[] }) {
-    return <LeafletMap initialLandmarks={initialLandmarks} initialIncidents={initialIncidents} />;
+export default function Map({
+    initialLandmarks,
+    initialIncidents,
+    theme = 'dark',
+    lowBandwidth = false
+}: {
+    initialLandmarks?: any[],
+    initialIncidents?: any[],
+    theme?: string,
+    lowBandwidth?: boolean
+}) {
+    return (
+        <LeafletMap
+            initialLandmarks={initialLandmarks}
+            initialIncidents={initialIncidents}
+            theme={theme}
+            lowBandwidth={lowBandwidth}
+        />
+    );
 }

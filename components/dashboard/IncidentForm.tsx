@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, AlertTriangle, Send, Loader2, TrafficCone, ShieldAlert, Car } from 'lucide-react';
+import { X, AlertTriangle, Send, Loader2, TrafficCone, ShieldAlert, Car, Camera } from 'lucide-react';
 import { reportIncident } from '@/app/dashboard/incidents/actions';
 
 interface IncidentFormProps {
@@ -109,6 +109,15 @@ const IncidentForm = ({ isOpen, onClose }: IncidentFormProps) => {
                                 placeholder="Specific location details or obstacle description..."
                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-all resize-none text-sm"
                             />
+                        </div>
+
+                        <div>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Visual Evidence (Optional)</label>
+                            <input type="file" name="photo" accept="image/*" id="incident-photo" className="hidden" />
+                            <label htmlFor="incident-photo" className="w-full bg-white/5 border border-white/10 border-dashed rounded-xl p-6 cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-white/10 transition-all group">
+                                <Camera size={24} className="text-slate-500 group-hover:text-red-500 transition-colors" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 group-hover:text-white">Capture_Field_Evidence</span>
+                            </label>
                         </div>
                     </div>
 

@@ -16,7 +16,7 @@ export default async function Dashboard() {
     // Fetch user profile
     const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name, role")
+        .select("id, full_name, role, trust_score, intel_credits, preferences")
         .eq("id", user.id)
         .single();
 
@@ -30,6 +30,7 @@ export default async function Dashboard() {
     const { data: incidents } = await supabase
         .from("incidents")
         .select("*")
+        .eq("status", "ACTIVE")
         .gt("expires_at", new Date().toISOString());
 
     // Fetch user's own submissions for history
@@ -41,9 +42,13 @@ export default async function Dashboard() {
 
     return (
         <DashboardClient
+            userId={user.id}
             userEmail={user.email!}
             fullName={profile?.full_name || user.email!.split('@')[0]}
             role={profile?.role || 'user'}
+            trustScore={profile?.trust_score || 0}
+            intelCredits={profile?.intel_credits || 0}
+            preferences={profile?.preferences || {}}
             initialLandmarks={landmarks || []}
             initialIncidents={incidents || []}
             userSubmissions={userSubmissions || []}
